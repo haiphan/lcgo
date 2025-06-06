@@ -3,8 +3,8 @@ package problems
 func robotWithString(s string) string {
 	cc := make([]int, 26)
 	N := len(s)
-	stack := make([]byte, 0)
-	res := make([]byte, 0)
+	stack := make([]byte, 0, N)
+	res := make([]byte, 0, N)
 	getSC := func() byte {
 		for i := range 26 {
 			if cc[i] > 0 {
