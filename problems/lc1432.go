@@ -5,21 +5,25 @@ import (
 	"strings"
 )
 
+func checkMin(c byte) bool {
+	return c != '0' && c != '1'
+}
+
+func checkMax(c byte) bool {
+	return c != '9'
+}
 func getReplace(num int, isMax bool) int {
 	s := strconv.Itoa(num)
 	old := byte('a')
+	chkFn := checkMin
+	if isMax {
+		chkFn = checkMax
+	}
 	for i := range len(s) {
 		c := s[i]
-		if isMax {
-			if c != '9' {
-				old = c
-				break
-			}
-		} else {
-			if c != '0' && c != '1' {
-				old = c
-				break
-			}
+		if chkFn(c) {
+			old = c
+			break
 		}
 	}
 	if old == 'a' {
