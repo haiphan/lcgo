@@ -57,7 +57,9 @@ func countBalancedPermutations(num string) int {
 	}
 	res := dp[targetSum][leftSize] * FACT_CACHE[leftSize] % MOD * FACT_CACHE[n-leftSize] % MOD
 	for _, c := range count {
-		res = res * IFACT_CACHE[c] % MOD
+		if c > 0 {
+			res = res * IFACT_CACHE[c] % MOD
+		}
 	}
 	return res
 }
