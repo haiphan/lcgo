@@ -2,7 +2,7 @@ package problems
 
 import "strconv"
 
-var PAR []int = []int{1, 0}
+var PAR []bool = []bool{true, false}
 
 func ReverseInt(n int) int {
 	reversedNum := 0
@@ -30,21 +30,21 @@ func isKPa(x int, k int) bool {
 func kMirror(k int, n int) int64 {
 	cnt := 0
 	res, l := 0, 1
-	curLen := 0
+	p10 := 1
 	for cnt < n {
-		curLen++
+		p10 *= 10
 		r := l * 10
-		for _, p := range PAR {
+		for _, odd := range PAR {
 			if cnt == n {
 				break
 			}
 			for i := l; i < r; i++ {
 				pre := i
-				if p == 1 {
+				if odd {
 					pre /= 10
 				}
 				ri := ReverseInt(i)
-				cand := (pre * intPow(10, curLen)) + ri
+				cand := (pre * p10) + ri
 				if isKPa(cand, k) {
 					cnt++
 					res += cand
