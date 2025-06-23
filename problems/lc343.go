@@ -1,18 +1,5 @@
 package problems
 
-func intPow(x, n int) int {
-	if n == 0 {
-		return 1
-	}
-	if n == 1 {
-		return x
-	}
-	res := pow(x*x, n/2)
-	if n%2 == 1 {
-		res *= x
-	}
-	return res
-}
 func integerBreak(n int) int {
 	if n == 2 {
 		return 1

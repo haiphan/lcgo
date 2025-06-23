@@ -15,7 +15,7 @@ func findJudge(n int, trust [][]int) int {
 			candidates[t[1]] = true
 		}
 	}
-	for k, _ := range candidates {
+	for k := range candidates {
 		if !hasTrust[k] {
 			return k
 		}
