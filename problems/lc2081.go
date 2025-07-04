@@ -1,32 +1,27 @@
 package problems
 
-import "strconv"
-
 var PAR []bool = []bool{true, false}
 
-func ReverseInt(n int) int {
-	reversedNum := 0
-	for n > 0 {
-		digit := n % 10
-		reversedNum = reversedNum*10 + digit
-		n /= 10
-	}
-
-	return reversedNum
-}
-
 func isKPa(x int, k int) bool {
-	s := strconv.FormatInt(int64(x), k)
-	l, r := 0, len(s)-1
-	for l < r {
-		if s[l] != s[r] {
-			return false
-		}
-		l++
-		r--
+	orig, rev := x, 0
+	for x > 0 {
+		rev = rev*k + x%k
+		x /= k
 	}
-	return true
+	return orig == rev
 }
+
+func genP10(x int, isOdd bool) int {
+	res := x
+	if isOdd {
+		x /= 10
+	}
+	for t := x; t > 0; t /= 10 {
+		res = res*10 + t%10
+	}
+	return res
+}
+
 func kMirror(k int, n int) int64 {
 	cnt := 0
 	res, l := 0, 1
@@ -39,12 +34,7 @@ func kMirror(k int, n int) int64 {
 				break
 			}
 			for i := l; i < r; i++ {
-				pre := i
-				if odd {
-					pre /= 10
-				}
-				ri := ReverseInt(i)
-				cand := (pre * p10) + ri
+				cand := genP10(i, odd)
 				if isKPa(cand, k) {
 					cnt++
 					res += cand
