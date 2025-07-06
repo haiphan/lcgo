@@ -1,9 +1,9 @@
 package problems
 
 type FindSumPairs struct {
-	nums1 []int
-	nums2 []int
-	nc2   map[int]int
+	nums1    []int
+	nums2    []int
+	countMap map[int]int
 }
 
 func FindSumPairsConstructor(nums1 []int, nums2 []int) FindSumPairs {
@@ -11,20 +11,20 @@ func FindSumPairsConstructor(nums1 []int, nums2 []int) FindSumPairs {
 	for _, x := range nums2 {
 		nc2[x]++
 	}
-	return FindSumPairs{nums1: nums1, nums2: nums2, nc2: nc2}
+	return FindSumPairs{nums1: nums1, nums2: nums2, countMap: nc2}
 }
 
 func (this *FindSumPairs) Add(index int, val int) {
 	ov := this.nums2[index]
 	this.nums2[index] += val
-	this.nc2[ov]--
-	this.nc2[this.nums2[index]]++
+	this.countMap[ov]--
+	this.countMap[this.nums2[index]]++
 }
 
 func (this *FindSumPairs) Count(tot int) int {
 	cnt := 0
 	for _, x := range this.nums1 {
-		if v, has := this.nc2[tot-x]; has {
+		if v, has := this.countMap[tot-x]; has {
 			cnt += v
 		}
 	}
