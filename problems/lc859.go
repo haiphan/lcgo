@@ -12,21 +12,21 @@ func Constructor() FreqStack {
 	return FreqStack{mf: 0, ntof: make(map[int]int), stack: stack}
 }
 
-func (this *FreqStack) Push(val int) {
-	this.ntof[val]++
-	this.mf = max(this.mf, this.ntof[val])
-	if this.ntof[val] == len(this.stack) {
-		this.stack = append(this.stack, []int{})
+func (fstack *FreqStack) Push(val int) {
+	fstack.ntof[val]++
+	fstack.mf = max(fstack.mf, fstack.ntof[val])
+	if fstack.ntof[val] == len(fstack.stack) {
+		fstack.stack = append(fstack.stack, []int{})
 	}
-	this.stack[this.ntof[val]] = append(this.stack[this.ntof[val]], val)
+	fstack.stack[fstack.ntof[val]] = append(fstack.stack[fstack.ntof[val]], val)
 }
 
-func (this *FreqStack) Pop() int {
-	v := this.stack[this.mf][len(this.stack[this.mf])-1]
-	this.ntof[v]--
-	this.stack[this.mf] = this.stack[this.mf][:len(this.stack[this.mf])-1]
-	if len(this.stack[this.mf]) == 0 {
-		this.mf--
+func (fstack *FreqStack) Pop() int {
+	v := fstack.stack[fstack.mf][len(fstack.stack[fstack.mf])-1]
+	fstack.ntof[v]--
+	fstack.stack[fstack.mf] = fstack.stack[fstack.mf][:len(fstack.stack[fstack.mf])-1]
+	if len(fstack.stack[fstack.mf]) == 0 {
+		fstack.mf--
 	}
 	return v
 }
