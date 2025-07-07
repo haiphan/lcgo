@@ -4,12 +4,12 @@ func findMinHeightTrees(n int, edges [][]int) []int {
 	if n == 1 {
 		return []int{0}
 	}
-	adj := make([][]int, n, n)
+	adj := make([][]int, n)
 	for i := range n {
 		adj[i] = []int{}
 	}
-	deg := make([]int, n, n)
-	done := make([]bool, n, n)
+	deg := make([]int, n)
+	done := make([]bool, n)
 	for _, e := range edges {
 		a, b := e[0], e[1]
 		adj[a] = append(adj[a], b)
