@@ -18,13 +18,13 @@ func StockSpannerConstructor() StockSpanner {
 	return StockSpanner{stack: make([]int, 0, 1e4)}
 }
 
-func (this *StockSpanner) Next(price int) int {
+func (sp *StockSpanner) Next(price int) int {
 	span := 1
-	for len(this.stack) > 0 && getPrice(this.stack[len(this.stack)-1]) <= price {
-		span += getSpan(this.stack[len(this.stack)-1])
-		this.stack = this.stack[:len(this.stack)-1]
+	for len(sp.stack) > 0 && getPrice(sp.stack[len(sp.stack)-1]) <= price {
+		span += getSpan(sp.stack[len(sp.stack)-1])
+		sp.stack = sp.stack[:len(sp.stack)-1]
 	}
-	this.stack = append(this.stack, span*SBASE+price)
+	sp.stack = append(sp.stack, span*SBASE+price)
 	return span
 }
 
