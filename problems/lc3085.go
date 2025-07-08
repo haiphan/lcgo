@@ -15,7 +15,7 @@ func minimumDeletions(word string, k int) int {
 		}
 	}
 	res := N
-	for minF, _ := range fset {
+	for minF := range fset {
 		cur := 0
 		for _, f := range freqs {
 			if f < minF {
