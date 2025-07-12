@@ -15,30 +15,6 @@ func heapifyBottom(heap []int) {
 	}
 }
 
-func hPop(heap []int) []int {
-	// swap top and bottom
-	heap[0], heap[len(heap)-1] = heap[len(heap)-1], heap[0]
-	heap = heap[:len(heap)-1]
-
-	// sort that top to bottom
-	i := 0
-	l, r := (i*2 + 1), (i*2 + 2)
-
-	for l < len(heap) {
-		j := minVal(l, r, heap)
-
-		if heap[j] >= heap[i] {
-			return heap
-		}
-		heap[j], heap[i] = heap[i], heap[j]
-
-		i = j
-		l, r = (i*2 + 1), (i*2 + 2)
-	}
-
-	return heap
-}
-
 func parent(i int) int {
 	return ((i + 1) / 2) - 1
 }
