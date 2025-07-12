@@ -2,7 +2,7 @@ package problems
 
 import "sort"
 
-func maxTaxiEarnings(n int, rides [][]int) int64 {
+func MaxTaxiEarnings(n int, rides [][]int) int64 {
 	m, ri := len(rides), 0
 	dp := make([]int, n+1)
 	sort.Slice(rides, func(i, j int) bool {
