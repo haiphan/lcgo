@@ -1,22 +1,23 @@
 package problems
 
+import "strings"
+
 func makeFancyString(s string) string {
 	N := len(s)
-	res := make([]byte, 0)
 	var prev byte
 	cnt := 0
-	for i := range N {
-		c := s[i]
-		if c == prev {
-			if cnt > 1 {
-				continue
-			}
-			cnt++
-		} else {
-			prev = c
+	sb := strings.Builder{}
+	for i := 0; i < N; i++ {
+		if s[i] != prev {
 			cnt = 1
+			prev = s[i]
+			sb.WriteByte(s[i])
+			continue
 		}
-		res = append(res, c)
+		if cnt < 2 {
+			cnt++
+			sb.WriteByte(s[i])
+		}
 	}
-	return string(res)
+	return sb.String()
 }
