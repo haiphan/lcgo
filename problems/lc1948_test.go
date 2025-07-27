@@ -2,6 +2,8 @@ package problems
 
 import (
 	"reflect"
+	"sort"
+	"strings"
 	"testing"
 )
 
@@ -26,6 +28,12 @@ func TestDeleteDuplicateFolder(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := deleteDuplicateFolder(tt.paths)
+			// sort alphabetically for comparison
+			sort.Slice(got, func(i, j int) bool {
+				sa := strings.Join(got[i], "/")
+				sb := strings.Join(got[i], "/")
+				return sa < sb
+			})
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("deleteDuplicateFolder() = %v, want %v", got, tt.want)
 			}
