@@ -31,7 +31,7 @@ func TestDeleteDuplicateFolder(t *testing.T) {
 			// sort alphabetically for comparison
 			sort.Slice(got, func(i, j int) bool {
 				sa := strings.Join(got[i], "/")
-				sb := strings.Join(got[i], "/")
+				sb := strings.Join(got[j], "/")
 				return sa < sb
 			})
 			if !reflect.DeepEqual(got, tt.want) {
