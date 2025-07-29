@@ -76,3 +76,17 @@ func intPow(x, n int) int {
 	}
 	return res
 }
+
+func intPowMod(x, n, m int) int {
+	if n == 0 {
+		return 1 % m
+	}
+	if n == 1 {
+		return x % m
+	}
+	res := intPowMod((x*x)%m, n/2, m)
+	if n%2 == 1 {
+		res = (res * x) % m
+	}
+	return res
+}
