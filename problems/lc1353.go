@@ -19,14 +19,6 @@ func parent(i int) int {
 	return ((i + 1) / 2) - 1
 }
 
-func minVal(l, r int, heap []int) int {
-	if r >= len(heap) || (heap[l] < heap[r]) {
-		return l
-	}
-
-	return r
-}
-
 func maxEvents(events [][]int) int {
 	N := len(events)
 	sort.Slice(events, func(i, j int) bool {

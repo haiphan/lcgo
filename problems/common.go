@@ -13,6 +13,18 @@ func abs(x int) int {
 	return x
 }
 
+func getPa(x int) int {
+	return (x - 1) / 2
+}
+
+func minVal(l, r int, heap []int) int {
+	if r >= len(heap) || (heap[l] < heap[r]) {
+		return l
+	}
+
+	return r
+}
+
 func hPop(heap []int) []int {
 	// swap top and bottom
 	heap[0], heap[len(heap)-1] = heap[len(heap)-1], heap[0]
@@ -35,18 +47,6 @@ func hPop(heap []int) []int {
 	}
 
 	return heap
-}
-
-func getPa(x int) int {
-	return (x - 1) / 2
-}
-
-func getMinIndex(h []int, l int) int {
-	r := l + 1
-	if r < len(h) && h[r] < h[l] {
-		return r
-	}
-	return l
 }
 
 func hPush(h []int, x int) []int {
