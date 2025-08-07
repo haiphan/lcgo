@@ -2,7 +2,6 @@ package problems
 
 func maxCollectedFruits(fruits [][]int) int {
 	n := len(fruits)
-	half := n / 2
 	n1 := n - 1
 	total := 0
 	for i := range n {
@@ -19,10 +18,7 @@ func maxCollectedFruits(fruits [][]int) int {
 		fruits[i][j] += maxPrev
 	}
 	for i := 1; i < n1; i++ {
-		lower := i + 1
-		if i < half {
-			lower = n - i - 1
-		}
+		lower := max(i+1, n-i-1)
 		for j := n1; j >= lower; j-- {
 			topDown(i, j)
 		}
@@ -39,10 +35,7 @@ func maxCollectedFruits(fruits [][]int) int {
 		fruits[i][j] += maxPrev
 	}
 	for j := 1; j < n1; j++ {
-		lower := j + 1
-		if j < half {
-			lower = n - j - 1
-		}
+		lower := max(j+1, n-j-1)
 		for i := n1; i >= lower; i-- {
 			leftRight(i, j)
 		}
