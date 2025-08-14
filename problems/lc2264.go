@@ -6,7 +6,7 @@ var cand []string = []string{"999", "888", "777", "666", "555", "444", "333", "2
 
 func largestGoodInteger(num string) string {
 	for _, c := range cand {
-		if strings.Index(num, c) >= 0 {
+		if strings.Contains(num, c) {
 			return c
 		}
 	}
