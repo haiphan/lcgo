@@ -84,9 +84,13 @@ func intPowMod(x, n, m int) int {
 	if n == 1 {
 		return x % m
 	}
-	res := intPowMod((x*x)%m, n/2, m)
-	if n%2 == 1 {
-		res = (res * x) % m
+	res := 1
+	for n > 0 {
+		if n%2 == 1 {
+			res = (res * x) % m
+		}
+		x = (x * x) % m
+		n = n >> 1
 	}
 	return res
 }
