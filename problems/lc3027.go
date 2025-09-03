@@ -21,6 +21,9 @@ func numberOfPairs2(points [][]int) int {
 			if yj >= yi && yj < ymax {
 				ymax = yj
 				res++
+				if yj == yi {
+					break
+				}
 			}
 
 		}

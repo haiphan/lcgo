@@ -19,7 +19,7 @@ func solveSudoku(board [][]byte) {
 			board[r][c] = byte('0' + v)
 		}
 	}
-
+	empties := make([]int, 0, 81)
 	rmNum := func(r, c, v int) {
 		mask := 1 << v
 		row[r] ^= mask
@@ -28,44 +28,55 @@ func solveSudoku(board [][]byte) {
 		board[r][c] = '.'
 	}
 
-	var dfs func(i int)
+	var backtrack func()
 
-	dfs = func(i int) {
+	backtrack = func() {
 		if done {
 			return
 		}
-		if i == 81 {
+		minIdx, minCand := -1, fullmask+1
+		var candVals int
+		for idx, pos := range empties {
+			r, c := pos/9, pos%9
+			if board[r][c] != '.' {
+				continue
+			}
+			rcq := row[r] | col[c] | qua[(r/3)*3+c/3]
+			cand := (rcq ^ fullmask) & fullmask
+			numCand := bits.OnesCount(uint(cand))
+			if numCand < minCand {
+				minCand = numCand
+				minIdx = idx
+				candVals = cand
+				if minCand == 1 {
+					break // can't get better than 1
+				}
+			}
+		}
+		if minIdx == -1 {
 			done = true
 			return
 		}
-		r, c := i/9, i%9
-		if board[r][c] == '.' {
-			rcq := row[r] | col[c] | qua[(r/3)*3+c/3]
-			if rcq == fullmask {
+		pos := empties[minIdx]
+		r, c := pos/9, pos%9
+		for cand := candVals; cand > 0; cand &= cand - 1 {
+			v := bits.TrailingZeros(uint(cand))
+			putNum(r, c, v, true)
+			backtrack()
+			if done {
 				return
 			}
-			cand := (rcq ^ fullmask) & fullmask
-			for cand > 0 {
-				v := bits.TrailingZeros(uint(cand))
-				cand &= cand - 1
-				putNum(r, c, v, true)
-				dfs(i + 1)
-				if done {
-					return
-				}
-				rmNum(r, c, v)
-			}
-		} else {
-			dfs(i + 1)
+			rmNum(r, c, v)
 		}
 	}
 	for i := range 9 {
 		for j := range 9 {
 			if board[i][j] == '.' {
-				continue
+				empties = append(empties, i*9+j)
+			} else {
+				putNum(i, j, int(board[i][j]-'0'), false)
 			}
-			putNum(i, j, int(board[i][j]-'0'), false)
 		}
 	}
-	dfs(0)
+	backtrack()
 }
