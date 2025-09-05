@@ -8,8 +8,8 @@ func makeTheIntegerZero(num1 int, num2 int) int {
 	}
 	for k := 1; k <= 60; k++ {
 		x := num1 - k*num2
-		if x < k {
-			return -1
+		if x < k || x <= 0 {
+			continue
 		}
 		if k >= bits.OnesCount64(uint64(x)) {
 			return k
