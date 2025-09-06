@@ -10,14 +10,13 @@ func minOperationsQueries(queries [][]int) int64 {
 			step++
 		}
 		cnt := 0
-		for ; l0 <= r; l0 *= 4 {
+		for ; l0 <= r; l0, step = 4*l0, step+1 {
 			r0 := (l0 << 2) - 1
 			if r0 >= l {
 				start := max(l0, l)
 				end := min(r0, r)
 				cnt += (end - start + 1) * step
 			}
-			step++
 		}
 		ans += (cnt >> 1) + (cnt & 1)
 	}
