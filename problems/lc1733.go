@@ -34,6 +34,9 @@ func minimumTeachings(n int, languages [][]int, friendships [][]int) int {
 		for j := range m {
 			if need[j] && !know[j][i] {
 				cnt++
+				if cnt >= minLearn {
+					break
+				}
 			}
 		}
 		minLearn = min(minLearn, cnt)
