@@ -6,6 +6,7 @@ func minimumTeachings(n int, languages [][]int, friendships [][]int) int {
 	m := len(languages)
 	know := make([][]bool, m)
 	need := make([]bool, m)
+	hasNeed := false
 	for i, langs := range languages {
 		know[i] = make([]bool, n+1)
 		for _, l := range langs {
@@ -27,6 +28,10 @@ func minimumTeachings(n int, languages [][]int, friendships [][]int) int {
 		}
 		need[f1] = true
 		need[f2] = true
+		hasNeed = true
+	}
+	if !hasNeed {
+		return 0
 	}
 	minLearn := math.MaxInt
 	for i := 1; i <= n; i++ {
