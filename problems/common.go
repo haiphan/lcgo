@@ -1,10 +1,37 @@
 package problems
 
-import "lcgo/utils"
+import (
+	"lcgo/utils"
+	"math"
+)
 
 const MOD int = 1e9 + 7
 
 type TreeNode = utils.TreeNode
+
+func rvInt(x int) int {
+	if x == 0 {
+		return 0
+	}
+	y := 0
+	for x > 0 {
+		y = y*10 + (x % 10)
+		x /= 10
+	}
+	return y
+}
+
+func getHead(x, l int) int {
+	if x == 0 {
+		return 0
+	}
+
+	numDigits := int(math.Log10(float64(x))) + 1
+
+	divisor := int(math.Pow10(numDigits - l))
+
+	return x / divisor
+}
 
 func abs(x int) int {
 	if x < 0 {
