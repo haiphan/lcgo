@@ -9,6 +9,13 @@ const MOD int = 1e9 + 7
 
 type TreeNode = utils.TreeNode
 
+func GCD(a, b int) int {
+	for b != 0 {
+		a, b = b, a%b
+	}
+	return a
+}
+
 func rvInt(x int) int {
 	if x == 0 {
 		return 0
