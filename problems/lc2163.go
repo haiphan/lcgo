@@ -16,7 +16,7 @@ func heapPush(h []int, x int, lessFn lessThanOp) []int {
 	h = append(h, x)
 	i := len(h) - 1
 	for i > 0 {
-		p := getPa(i)
+		p := (i - 1) >> 1
 		if h[p] == h[i] || lessFn(h[p], h[i]) {
 			break
 		}
