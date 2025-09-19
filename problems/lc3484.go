@@ -14,25 +14,25 @@ func SpreadsheetConstructor(rows int) Spreadsheet {
 	return Spreadsheet{m: make(map[string]int)}
 }
 
-func (this *Spreadsheet) SetCell(cell string, value int) {
-	this.m[cell] = value
+func (ss *Spreadsheet) SetCell(cell string, value int) {
+	ss.m[cell] = value
 }
 
-func (this *Spreadsheet) ResetCell(cell string) {
-	delete(this.m, cell)
+func (ss *Spreadsheet) ResetCell(cell string) {
+	delete(ss.m, cell)
 }
 
-func (this *Spreadsheet) Parse(s string) int {
+func (ss *Spreadsheet) Parse(s string) int {
 	if unicode.IsLetter(rune(s[0])) {
-		return this.m[s]
+		return ss.m[s]
 	}
 	x, _ := strconv.Atoi(s)
 	return x
 }
 
-func (this *Spreadsheet) GetValue(formula string) int {
+func (ss *Spreadsheet) GetValue(formula string) int {
 	plusIndex := strings.Index(formula, "+")
-	return this.Parse(formula[1:plusIndex]) + this.Parse(formula[plusIndex+1:])
+	return ss.Parse(formula[1:plusIndex]) + ss.Parse(formula[plusIndex+1:])
 }
 
 /**
