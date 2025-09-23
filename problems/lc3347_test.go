@@ -20,6 +20,13 @@ func TestMaxFrequency(t *testing.T) {
 			numOperations: 2,
 			want:          2,
 		},
+		{
+			name:          "Example 2",
+			nums:          []int{5, 11, 20, 20},
+			k:             5,
+			numOperations: 1,
+			want:          2,
+		},
 	}
 
 	for _, tt := range tests {
