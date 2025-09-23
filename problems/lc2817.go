@@ -7,7 +7,7 @@ func minAbsoluteDifference(nums []int, x int) int {
 		return 0
 	}
 	N := len(nums)
-	tree := redblacktree.NewWithIntComparator()
+	var tree *redblacktree.Tree = redblacktree.NewWithIntComparator()
 
 	res := abs(nums[0] - nums[N-1])
 
