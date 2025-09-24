@@ -1,86 +1,72 @@
 package problems
 
+import "container/heap"
+
 type Food struct {
-	n, c string
-	r    int
+	n, c         string
+	r, heapIndex int
+}
+
+type FHeap []*Food
+
+func (fh FHeap) Len() int { return len(fh) }
+func (fh FHeap) Less(i, j int) bool {
+	return fh[i].r > fh[j].r || (fh[i].r == fh[j].r && fh[i].n < fh[j].n)
+}
+func (fh FHeap) Swap(i, j int) {
+	fh[i], fh[j] = fh[j], fh[i]
+	fh[i].heapIndex = i
+	fh[j].heapIndex = j
+}
+
+func (fh *FHeap) Push(x interface{}) {
+	item := x.(*Food)
+	*fh = append(*fh, item)
+}
+
+func (fh *FHeap) Pop() interface{} {
+	old := *fh
+	n := len(old)
+	item := old[n-1]
+	*fh = old[0 : n-1]
+	return item
 }
 
 type FoodRatings struct {
-	cToQ map[string][]Food
-	nToF map[string]Food
-}
-
-func FLessThan(a, b Food) bool {
-	if a.r == b.r {
-		return a.n < b.n
-	}
-	return b.r < a.r
-}
-
-func FHPush(h []Food, x Food) []Food {
-	h = append(h, x)
-	cur := len(h) - 1
-	for cur > 0 {
-		p := (cur - 1) >> 1
-		if FLessThan(h[p], h[cur]) {
-			break
-		}
-		h[p], h[cur] = h[cur], h[p]
-		cur = p
-	}
-	return h
-}
-
-func FHPop(h []Food) []Food {
-	last := h[len(h)-1]
-	h[0] = last
-	h = h[:len(h)-1]
-	cur, l := 0, 1
-	for l < len(h) {
-		r := l + 1
-		c := l
-		if r < len(h) && FLessThan(h[r], h[l]) {
-			c = r
-		}
-		if FLessThan(h[cur], h[c]) {
-			break
-		}
-		h[cur], h[c] = h[c], h[cur]
-		cur = c
-		l = cur*2 + 1
-	}
-	return h
+	cToQ map[string]*FHeap
+	nToF map[string]*Food
 }
 
 func FoodRatingsConstructor(foods []string, cuisines []string, ratings []int) FoodRatings {
-	cToQ := make(map[string][]Food, len(foods))
-	nToF := make(map[string]Food, len(foods))
+	cToQ := make(map[string]*FHeap, len(foods))
+	nToF := make(map[string]*Food, len(foods))
 	for i, f := range foods {
-		item := Food{n: f, c: cuisines[i], r: ratings[i]}
+		item := &Food{n: f, c: cuisines[i], r: ratings[i]}
 		if _, has := cToQ[cuisines[i]]; !has {
-			cToQ[cuisines[i]] = make([]Food, 0)
+			cToQ[cuisines[i]] = &FHeap{}
 		}
-		cToQ[cuisines[i]] = FHPush(cToQ[cuisines[i]], Food{n: f, c: cuisines[i], r: ratings[i]})
+		item.heapIndex = cToQ[cuisines[i]].Len()
+		*cToQ[cuisines[i]] = append(*cToQ[cuisines[i]], item)
 		nToF[f] = item
+	}
+	for _, fh := range cToQ {
+		heap.Init(fh)
 	}
 	return FoodRatings{cToQ: cToQ, nToF: nToF}
 }
 
 func (fr *FoodRatings) ChangeRating(food string, newRating int) {
-	item := fr.nToF[food]
-	item.r = newRating
-	fr.nToF[food] = item
-	copy := item
-	fr.cToQ[copy.c] = FHPush(fr.cToQ[copy.c], copy)
+	f := fr.nToF[food]
+	f.r = newRating
+	heap.Fix(fr.cToQ[f.c], f.heapIndex)
 }
 
 func (fr *FoodRatings) HighestRated(cuisine string) string {
-	top := fr.cToQ[cuisine][0]
-	for top.r != fr.nToF[top.n].r {
-		fr.cToQ[cuisine] = FHPop(fr.cToQ[cuisine])
-		top = fr.cToQ[cuisine][0]
+	fh := fr.cToQ[cuisine]
+	if fh != nil && fh.Len() > 0 {
+		return (*fh)[0].n
 	}
-	return top.n
+	return ""
 }
 
 /**
