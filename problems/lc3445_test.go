@@ -24,6 +24,12 @@ func TestMaxDifferenceII(t *testing.T) {
 			k:    3,
 			want: 1,
 		},
+		{
+			name: "Example 3",
+			s:    "110",
+			k:    3,
+			want: -1,
+		},
 	}
 
 	for _, tt := range tests {
