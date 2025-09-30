@@ -1,12 +1,13 @@
 package problems
 
+import "math/bits"
+
 var invTen [10]int = [10]int{0, 1, 0, 7, 0, 0, 0, 3, 0, 9}
 
 func factor(x int) [3]int {
-	exp2, exp5 := 0, 0
-	for ; (x & 1) == 0; x = x >> 1 {
-		exp2++
-	}
+	exp2 := bits.TrailingZeros64(uint64(x))
+	x >>= exp2
+	exp5 := 0
 	for ; (x % 5) == 0; x /= 5 {
 		exp5++
 	}
