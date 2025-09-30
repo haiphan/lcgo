@@ -16,6 +16,13 @@ func GCD(a, b int) int {
 	return a
 }
 
+func getds(n int) int {
+	if n < 10 {
+		return n
+	}
+	return (n % 10) + getds(n/10)
+}
+
 func rvInt(x int) int {
 	if x == 0 {
 		return 0
