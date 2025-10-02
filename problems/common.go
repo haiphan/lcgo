@@ -9,6 +9,9 @@ const MOD int = 1e9 + 7
 
 type TreeNode = utils.TreeNode
 
+var drs [4]int = [4]int{-1, 1, 0, 0}
+var dcs [4]int = [4]int{0, 0, -1, 1}
+
 func GCD(a, b int) int {
 	for b != 0 {
 		a, b = b, a%b
