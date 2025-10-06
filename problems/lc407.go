@@ -8,8 +8,6 @@ func RLessThan(a, b RCell) bool {
 	return a.h < b.h
 }
 
-var gridDirs [5]int = [5]int{0, 1, 0, -1, 0}
-
 func RHPush(h []RCell, x RCell) []RCell {
 	cur := len(h)
 	h = append(h, x)

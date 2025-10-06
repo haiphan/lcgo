@@ -7,6 +7,8 @@ import (
 
 const MOD int = 1e9 + 7
 
+var gridDirs [5]int = [5]int{0, 1, 0, -1, 0}
+
 type TreeNode = utils.TreeNode
 
 var drs [4]int = [4]int{-1, 1, 0, 0}
