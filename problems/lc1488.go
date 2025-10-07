@@ -28,7 +28,9 @@ func avoidFlood(rains []int) []int {
 				ans[free[di]] = r
 				free[di] = -1
 				if di == li {
-					li++
+					for li < len(free) && free[li] == -1 {
+						li++
+					}
 				}
 			}
 			lm[r] = i
