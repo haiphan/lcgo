@@ -3,12 +3,14 @@ package problems
 func maximumEnergy(energy []int, k int) int {
 	ee := energy
 	n := len(ee)
-	dp := make([]int, k)
-	maxv := energy[n-1]
-	for i := n - 1; i >= 0; i-- {
-		j := i % k
-		dp[j] += ee[i]
-		maxv = max(maxv, dp[j])
+	maxv := ee[n-1]
+	for d := range k {
+		start := n - 1 - d
+		cur := 0
+		for i := start; i >= 0; i -= k {
+			cur += ee[i]
+			maxv = max(maxv, cur)
+		}
 	}
 	return maxv
 }
