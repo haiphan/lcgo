@@ -2,23 +2,33 @@ package problems
 
 func minTime(skill []int, mana []int) int64 {
 	n, m := len(skill), len(mana)
-	prefix_skills := make([]int, n)
-	prefix_skills[0] = skill[0]
-	for i := 1; i < n; i++ {
-		prefix_skills[i] = prefix_skills[i-1] + skill[i]
+	pre_skill := make([]int, n+1)
+	for i, x := range skill {
+		pre_skill[i+1] = pre_skill[i] + x
 	}
-	total_time := 0
-
-	for j := 1; j < m; j++ {
-		max_time := 0
-		cur, prev := mana[j], mana[j-1]
-		e := 0
-		for i := range n {
-			max_time = max(max_time, prefix_skills[i]*prev-e)
-			e = prefix_skills[i] * cur
+	dec := []int{n - 1}
+	for i := n - 2; i >= 0; i-- {
+		if skill[i] > skill[dec[len(dec)-1]] {
+			dec = append(dec, i)
 		}
-		total_time += max_time
 	}
-
-	return int64(total_time + prefix_skills[n-1]*mana[m-1])
+	inc := []int{0}
+	for i := 1; i < n; i++ {
+		if skill[i] > skill[inc[len(inc)-1]] {
+			inc = append(inc, i)
+		}
+	}
+	start := 0
+	for j := 1; j < m; j++ {
+		stack := dec
+		if mana[j-1] < mana[j] {
+			stack = inc
+		}
+		maxv := 0
+		for _, i := range stack {
+			maxv = max(maxv, mana[j-1]*pre_skill[i+1]-mana[j]*pre_skill[i])
+		}
+		start += maxv
+	}
+	return int64(start + pre_skill[n]*mana[m-1])
 }
