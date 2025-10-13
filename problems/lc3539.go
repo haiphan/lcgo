@@ -47,11 +47,13 @@ func magicalSum(m int, k int, nums []int) int {
 			return cv
 		}
 		ans := 0
+		vProd := 1
 		for take := 0; take <= remaining; take++ {
-			ways := CNK[remaining][take] * intPowMod(nums[index], take, MOD) % MOD
+			ways := CNK[remaining][take] * vProd % MOD
 			new_carry := carry + take
 			next_odd_needed, next_carry := odd_needed-(new_carry%2), new_carry>>1
 			ans = (ans + ways*dfs(remaining-take, next_odd_needed, index+1, next_carry)) % MOD
+			vProd = vProd * nums[index] % MOD
 		}
 		cc[ck] = ans
 		return ans
