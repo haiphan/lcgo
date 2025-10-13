@@ -41,7 +41,7 @@ func magicalSum(m int, k int, nums []int) int {
 		if index >= L {
 			return 0
 		}
-		ck := remaining + 31*odd_needed + 31*31*index + 31*31*51*carry
+		ck := remaining + 31*odd_needed + 961*index + 49011*carry
 		cv, has := cc[ck]
 		if has {
 			return cv
