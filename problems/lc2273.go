@@ -1,22 +1,18 @@
 package problems
 
-func getStrHash(s string) int {
+func getStrCount(s string) [26]int {
 	var cm [26]int
-	h := 17
 	for _, c := range s {
 		cm[c-'a']++
 	}
-	for _, v := range cm {
-		h = (h*7 + v) & 0xffffffffff
-	}
-	return h
+	return cm
 }
 
 func removeAnagrams(words []string) []string {
-	cur := -1
+	var cur [26]int
 	stack := make([]string, 0, len(words))
 	for _, w := range words {
-		h := getStrHash(w)
+		h := getStrCount(w)
 		if h == cur {
 			continue
 		}

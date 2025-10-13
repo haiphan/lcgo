@@ -50,7 +50,8 @@ func magicalSum(m int, k int, nums []int) int {
 		for take := 0; take <= remaining; take++ {
 			ways := CNK[remaining][take] * intPowMod(nums[index], take, MOD) % MOD
 			new_carry := carry + take
-			ans = (ans + ways*dfs(remaining-take, odd_needed-(new_carry%2), index+1, new_carry>>1)) % MOD
+			next_odd_needed, next_carry := odd_needed-(new_carry%2), new_carry>>1
+			ans = (ans + ways*dfs(remaining-take, next_odd_needed, index+1, next_carry)) % MOD
 		}
 		cc[ck] = ans
 		return ans
