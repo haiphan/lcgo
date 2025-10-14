@@ -2,35 +2,29 @@ package problems
 
 import "sort"
 
-func getPrevIndex(events [][]int, start int) int {
-	l, r, res := 0, len(events)-1, -1
-	for l <= r {
-		m := (l + r) / 2
-		if events[m][1] < start {
-			res, l = m, m+1
-		} else {
-			r = m - 1
-		}
-	}
-	return res
-}
 func maxValue(events [][]int, k int) int {
 	n := len(events)
 	sort.Slice(events, func(i, j int) bool {
-		return events[i][1] < events[j][1]
+		return events[i][0] < events[j][0]
 	})
-	dp := make([][]int, n+1)
-	dp[0] = make([]int, k+1)
-	for i := 1; i <= n; i++ {
-		dp[i] = make([]int, k+1)
-		e := events[i-1]
-		prev := getPrevIndex(events, e[0])
-		for j := 1; j <= k; j++ {
-			skip := dp[i-1][j]
-			take := e[2] + dp[prev+1][j-1]
-			dp[i][j] = max(skip, take)
+	d1 := make([]int, n+1)
+	d2 := make([]int, n+1)
+	dp := [2][]int{d1, d2}
+	next := make([]int, n)
+	for j := range n {
+		end := events[j][1]
+		next[j] = sort.Search(n, func(i int) bool {
+			return i > j && events[i][0] > end
+		})
+	}
+	for j := 1; j <= k; j++ {
+		cur := j & 1
+		prev := cur ^ 1
+		for i := n - 1; i >= 0; i-- {
+			attend_i := events[i][2] + dp[prev][next[i]]
+			skip_i := dp[cur][i+1]
+			dp[cur][i] = max(attend_i, skip_i)
 		}
 	}
-
-	return dp[n][k]
+	return dp[k&1][0]
 }
