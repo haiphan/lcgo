@@ -49,11 +49,19 @@ func magicalSum(m int, k int, nums []int) int {
 		ans := 0
 		vProd := 1
 		for take := 0; take <= remaining; take++ {
-			ways := CNK[remaining][take] * vProd % MOD
+			if take > 0 {
+				vProd = vProd * nums[index] % MOD
+			}
+
 			new_carry := carry + take
 			next_odd_needed, next_carry := odd_needed-(new_carry%2), new_carry>>1
-			ans = (ans + ways*dfs(remaining-take, next_odd_needed, index+1, next_carry)) % MOD
-			vProd = vProd * nums[index] % MOD
+			sub := dfs(remaining-take, next_odd_needed, index+1, next_carry)
+			if sub == 0 {
+				continue
+			}
+			ways := CNK[remaining][take] * vProd % MOD
+			addVal := ways * sub % MOD
+			ans = (ans + addVal) % MOD
 		}
 		cc[ck] = ans
 		return ans
