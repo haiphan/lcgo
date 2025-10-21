@@ -15,23 +15,27 @@ func maxFrequencyI(nums []int, k int, numOperations int) int {
 		for nums[l]+k < v {
 			l++
 		}
-		for r+1 < L && v+k >= nums[r+1] {
+		for r < L && v+k >= nums[r] {
 			r++
 		}
+		cnt := r - l
+		if cnt <= res {
+			continue
+		}
 		cv := cm[v]
-		cnt := r - l + 1
 		change := min(n, cnt-cv)
 		res = max(res, cv+change)
 	}
 	if res >= n {
 		return res
 	}
+	tk := k << 1
 	l, r = 0, 0
-	for ; r < L; r++ {
-		for nums[l]+2*k < nums[r] {
+	for ; r < L && (l+res) < L; r++ {
+		for r-l+1 > n || nums[l]+tk < nums[r] {
 			l++
 		}
-		res = max(res, min(n, r-l+1))
+		res = max(res, r-l+1)
 	}
 	return res
 }
