@@ -1,21 +1,22 @@
 package problems
 
-import "sort"
+type Ride struct {
+	e, t int
+}
 
-func MaxTaxiEarnings(n int, rides [][]int) int64 {
-	m, ri := len(rides), 0
+func maxTaxiEarnings(n int, rides [][]int) int64 {
+	rs := make([][]Ride, n)
+	for _, r := range rides {
+		s, e, t := r[0], r[1], r[2]
+		rs[s] = append(rs[s], Ride{e: e, t: e - s + t})
+	}
 	dp := make([]int, n+1)
-	sort.Slice(rides, func(i, j int) bool {
-		return rides[i][0] < rides[j][0]
-	})
-	for i := 1; i <= n; i++ {
-		dp[i] = max(dp[i], dp[i-1])
-		for ri < m && rides[ri][0] == i {
-			cur := rides[ri]
-			e, t := cur[1], cur[2]
-			dp[e] = max(dp[e], dp[i]+e-i+t)
-			ri++
+	for i := n - 1; i >= 1; i-- {
+		dp[i] = max(dp[i], dp[i+1])
+		ra := rs[i]
+		for _, r := range ra {
+			dp[i] = max(dp[i], r.t+dp[r.e])
 		}
 	}
-	return int64(dp[n])
+	return int64(dp[1])
 }
