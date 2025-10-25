@@ -36,30 +36,30 @@ func moveBack(node *LNode, r *LNode) {
 	node.prev, node.next = newPrev, newNext
 }
 
-func (this *LRUCache) Get(key int) int {
-	node, has := this.cache[key]
+func (lruc *LRUCache) Get(key int) int {
+	node, has := lruc.cache[key]
 	if !has {
 		return -1
 	}
-	moveBack(node, this.right)
+	moveBack(node, lruc.right)
 	return node.value
 }
 
-func (this *LRUCache) Put(key int, value int) {
-	node, has := this.cache[key]
+func (lruc *LRUCache) Put(key int, value int) {
+	node, has := lruc.cache[key]
 	if has {
 		node.value = value
 	} else {
 		node = &LNode{key: key, value: value}
-		this.cache[key] = node
+		lruc.cache[key] = node
 	}
-	moveBack(node, this.right)
-	if len(this.cache) > this.cap {
-		node = this.left.next
+	moveBack(node, lruc.right)
+	if len(lruc.cache) > lruc.cap {
+		node = lruc.left.next
 		next := node.next
-		this.left.next = next
-		next.prev = this.left
-		delete(this.cache, node.key)
+		lruc.left.next = next
+		next.prev = lruc.left
+		delete(lruc.cache, node.key)
 	}
 }
 
