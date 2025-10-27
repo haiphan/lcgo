@@ -2,7 +2,7 @@ package problems
 
 func numSubmat(mat [][]int) int {
 	m, n := len(mat), len(mat[0])
-	h := make([]int, n, n)
+	h := make([]int, n)
 	stack := make([]int, 0, n)
 	res := 0
 	countRow := func(r int) int {
