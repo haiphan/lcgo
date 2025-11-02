@@ -14,17 +14,17 @@ func FindSumPairsConstructor(nums1 []int, nums2 []int) FindSumPairs {
 	return FindSumPairs{nums1: nums1, nums2: nums2, countMap: nc2}
 }
 
-func (this *FindSumPairs) Add(index int, val int) {
-	ov := this.nums2[index]
-	this.nums2[index] += val
-	this.countMap[ov]--
-	this.countMap[this.nums2[index]]++
+func (findNP *FindSumPairs) Add(index int, val int) {
+	ov := findNP.nums2[index]
+	findNP.nums2[index] += val
+	findNP.countMap[ov]--
+	findNP.countMap[findNP.nums2[index]]++
 }
 
-func (this *FindSumPairs) Count(tot int) int {
+func (findNP *FindSumPairs) Count(tot int) int {
 	cnt := 0
-	for _, x := range this.nums1 {
-		if v, has := this.countMap[tot-x]; has {
+	for _, x := range findNP.nums1 {
+		if v, has := findNP.countMap[tot-x]; has {
 			cnt += v
 		}
 	}
