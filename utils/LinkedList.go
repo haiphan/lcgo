@@ -17,3 +17,11 @@ func CreateLinkedList(arr []int) *ListNode {
 	}
 	return dummy.Next
 }
+
+func LinkedListToArray(head *ListNode) []int {
+	var arr []int
+	for cur := head; cur != nil; cur = cur.Next {
+		arr = append(arr, cur.Val)
+	}
+	return arr
+}
