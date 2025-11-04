@@ -19,7 +19,7 @@ func CreateLinkedList(arr []int) *ListNode {
 }
 
 func LinkedListToArray(head *ListNode) []int {
-	var arr []int
+	arr := []int{}
 	for cur := head; cur != nil; cur = cur.Next {
 		arr = append(arr, cur.Val)
 	}
