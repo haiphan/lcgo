@@ -64,7 +64,7 @@ func findXSum(nums []int, k int, x int) []int {
 	ans := make([]int, n-k+1)
 	var freq [MAXNV]int
 	bs := NewBitSetCnt()
-	for i := 0; i < k; i++ {
+	for i := range k {
 		v := nums[i]
 		bs.ShiftLeft(v, freq[v])
 		freq[v]++
