@@ -5,7 +5,7 @@ import "strings"
 func finalValueAfterOperations(operations []string) int {
 	x := 0
 	for _, op := range operations {
-		if strings.Index(op, "++") >= 0 {
+		if strings.Contains(op, "++") {
 			x++
 		}
 	}
