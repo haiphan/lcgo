@@ -1,114 +1,146 @@
 package problems
 
-import "github.com/emirpasic/gods/trees/redblacktree"
+import "container/heap"
 
-type CItem struct {
-	v int
-	f int
+type FItem struct {
+	f, v, i int
+	x       bool
 }
 
-func ItemComparator(a, b interface{}) int {
-	itemA := a.(CItem)
-	itemB := b.(CItem)
+func compareBig(a, b *FItem) bool {
+	if a.f == b.f {
+		return a.v > b.v
+	}
+	return a.f > b.f
+}
 
-	if itemA.f < itemB.f {
-		return -1
+func compareSmall(a, b *FItem) bool {
+	return !compareBig(a, b)
+}
+
+type CompareFn func(*FItem, *FItem) bool
+
+type FreqHeap struct {
+	q      []*FItem
+	lessFn CompareFn
+}
+
+func NewFHeap(f CompareFn) *FreqHeap {
+	return &FreqHeap{q: []*FItem{}, lessFn: f}
+}
+
+func (h FreqHeap) Len() int { return len(h.q) }
+
+func (h FreqHeap) Less(i, j int) bool {
+	return h.lessFn(h.q[i], h.q[j])
+}
+
+func (h FreqHeap) Swap(i, j int) {
+	h.q[i], h.q[j] = h.q[j], h.q[i]
+	h.q[i].i = i
+	h.q[j].i = j
+}
+
+func (h *FreqHeap) Push(x any) {
+	n := len(h.q)
+	item := x.(*FItem)
+	h.q = append(h.q, item)
+	item.i = n
+}
+
+func (h *FreqHeap) Pop() any {
+	old := h.q
+	n := len(old)
+	item := old[n-1]
+	old[n-1] = nil
+	item.i = -1
+	item.x = false
+	h.q = old[:n-1]
+	return item
+}
+
+func (h *FreqHeap) RemoveItem(x *FItem) *FItem {
+	if x.i < 0 || x.i >= len(h.q) || h.q[x.i] != x {
+		return nil
 	}
-	if itemA.f > itemB.f {
-		return 1
+	removedItem := heap.Remove(h, x.i)
+	return removedItem.(*FItem)
+}
+
+func (h *FreqHeap) UpdateItem(x *FItem, freq int) {
+	if x.i < 0 || x.i >= len(h.q) || h.q[x.i] != x {
+		return
 	}
 
-	if itemA.v < itemB.v {
-		return -1
+	x.f = freq
+	if freq == 0 {
+		h.RemoveItem(x)
+		return
 	}
-	if itemA.v > itemB.v {
-		return 1
-	}
+	heap.Fix(h, x.i)
+}
 
-	return 0
+func (h *FreqHeap) Peek() *FItem {
+	if h.Len() == 0 {
+		return nil
+	}
+	return h.q[0]
 }
 
 func findXSum3321(nums []int, k int, x int) []int64 {
-	bigTree := redblacktree.NewWith(ItemComparator)
-	smallTree := redblacktree.NewWith(ItemComparator)
-	bIt := bigTree.Iterator()
-	sIt := smallTree.Iterator()
+	xHeap := NewFHeap(compareSmall)
+	rHeap := NewFHeap(compareBig)
 	n := len(nums)
-	nc := make(map[int]int)
+	nc := make(map[int]*FItem)
 	sum := 0
 	ans := make([]int64, n-k+1)
-	balance := func() {
-		for bigTree.Size() < x && smallTree.Size() > 0 {
-			sIt.Last()
-			item := sIt.Key().(CItem)
-			sum += item.f * item.v
-			smallTree.Remove(item)
-			bigTree.Put(item, true)
-		}
-		for bigTree.Size() > x {
-			bIt.First()
-			item := bIt.Key().(CItem)
-			sum -= item.f * item.v
-			bigTree.Remove(item)
-			smallTree.Put(item, true)
-		}
-		if bigTree.Size() == 0 || smallTree.Size() == 0 {
-			return
-		}
-		for {
-			bIt.First()
-			bigItem := bIt.Key().(CItem)
-			sIt.Last()
-			smallItem := sIt.Key().(CItem)
-			if ItemComparator(smallItem, bigItem) < 0 {
-				return
+	for i, cur := range nums {
+		curItem, has := nc[cur]
+		if !has {
+			curItem = &FItem{f: 1, v: cur, i: -1, x: false}
+			nc[cur] = curItem
+			heap.Push(rHeap, curItem)
+		} else if curItem.x {
+			sum += cur
+			xHeap.UpdateItem(curItem, curItem.f+1)
+		} else {
+			oldF := curItem.f
+			curItem.f++
+			if oldF == 0 {
+				heap.Push(rHeap, curItem)
+			} else {
+				rHeap.UpdateItem(curItem, oldF+1)
 			}
-			bigTree.Remove(bigItem)
-			smallTree.Remove(smallItem)
-			sum += smallItem.f*smallItem.v - bigItem.f*bigItem.v
-			smallTree.Put(bigItem, true)
-			bigTree.Put(smallItem, true)
 		}
-	}
+		if i >= k {
+			prev := nums[i-k]
+			item := nc[prev]
+			f := item.f - 1
+			if item.x {
+				xHeap.UpdateItem(item, f)
+				sum -= prev
+			} else {
+				rHeap.UpdateItem(item, f)
+			}
+		}
 
-	add := func(v int) {
-		cur := CItem{v: v, f: nc[v]}
-		if _, has := bigTree.Get(cur); has {
-			bigTree.Remove(cur)
-			sum -= cur.f * cur.v
-		} else {
-			smallTree.Remove(cur)
+		if rHeap.Len() > 0 && xHeap.Len() < x {
+			item := heap.Pop(rHeap).(*FItem)
+			item.x = true
+			heap.Push(xHeap, item)
+			sum += item.f * item.v
 		}
-		nc[v]++
-		cur.f++
-		smallTree.Put(cur, true)
-		balance()
-	}
-	remove := func(v int) {
-		cur := CItem{v: v, f: nc[v]}
-		if _, has := bigTree.Get(cur); has {
-			bigTree.Remove(cur)
-			sum -= cur.f * cur.v
-		} else {
-			smallTree.Remove(cur)
+		if rHeap.Len() > 0 && xHeap.Len() == x && compareSmall(xHeap.Peek(), rHeap.Peek()) {
+			rItem := heap.Pop(rHeap).(*FItem)
+			xItem := heap.Pop(xHeap).(*FItem)
+			rItem.x = true
+			sum += rItem.f*rItem.v - xItem.f*xItem.v
+			heap.Push(xHeap, rItem)
+			heap.Push(rHeap, xItem)
 		}
-		nc[v]--
-		cur.f--
-		if cur.f > 0 {
-			smallTree.Put(cur, true)
-		} else {
-			delete(nc, v)
+		if i >= k-1 {
+			ans[i-k+1] = int64(sum)
 		}
-		balance()
-	}
-	for i := range k {
-		add(nums[i])
-	}
-	ans[0] = int64(sum)
-	for i := k; i < n; i++ {
-		add(nums[i])
-		remove(nums[i-k])
-		ans[i-k+1] = int64(sum)
 	}
 	return ans
 }
