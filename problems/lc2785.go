@@ -3,12 +3,7 @@ package problems
 import "strings"
 
 func isVowel(r byte) bool {
-	switch r {
-	case 'A', 'E', 'I', 'O', 'U', 'a', 'e', 'i', 'o', 'u':
-		return true
-	default:
-		return false
-	}
+	return r == 'a' || r == 'e' || r == 'i' || r == 'o' || r == 'u' || r == 'A' || r == 'E' || r == 'I' || r == 'O' || r == 'U'
 }
 
 func sortVowels(s string) string {
