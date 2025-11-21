@@ -77,35 +77,35 @@ func (lc *LFUCache) counter(node *LFNode) {
 	}
 }
 
-func (this *LFUCache) Get(key int) int {
-	node, has := this.valueMap[key]
+func (lc *LFUCache) Get(key int) int {
+	node, has := lc.valueMap[key]
 	if !has {
 		return -1
 	}
-	this.counter(node)
+	lc.counter(node)
 	return node.value
 }
 
-func (this *LFUCache) Put(key int, value int) {
-	node, has := this.valueMap[key]
+func (lc *LFUCache) Put(key int, value int) {
+	node, has := lc.valueMap[key]
 	if has {
 		node.value = value
-		this.counter(node)
+		lc.counter(node)
 	} else {
 		node = createLFNode(key, value)
-		if len(this.valueMap) == this.capacity {
-			minList := this.listMap[this.minF]
+		if len(lc.valueMap) == lc.capacity {
+			minList := lc.listMap[lc.minF]
 			rmNode := minList.removeTail()
-			delete(this.valueMap, rmNode.key)
+			delete(lc.valueMap, rmNode.key)
 		}
-		oneList, hasL := this.listMap[1]
+		oneList, hasL := lc.listMap[1]
 		if !hasL {
 			oneList = createNodeList()
-			this.listMap[1] = oneList
+			lc.listMap[1] = oneList
 		}
 		oneList.insert(node)
-		this.valueMap[key] = node
-		this.minF = 1
+		lc.valueMap[key] = node
+		lc.minF = 1
 	}
 }
 
