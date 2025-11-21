@@ -3,6 +3,7 @@ package problems
 import "math/bits"
 
 func countPalindromicSubsequence(s string) int {
+	const fullMask uint32 = (1<<26 - 1)
 	ans := 0
 	var first [26]int
 	var last [26]int
@@ -22,6 +23,9 @@ func countPalindromicSubsequence(s string) int {
 			var cur uint32
 			for j := head + 1; j < tail; j++ {
 				cur |= (1 << uint32(s[j]-'a'))
+				if cur == fullMask {
+					break
+				}
 			}
 			ans += bits.OnesCount32(cur)
 		}
