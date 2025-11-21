@@ -5,7 +5,7 @@ import "strings"
 func minExtraChar(s string, dictionary []string) int {
 	N := len(s)
 	N1 := N + 1
-	cache := make([]int, N, N)
+	cache := make([]int, N)
 	for i := range N {
 		cache[i] = N1
 	}
