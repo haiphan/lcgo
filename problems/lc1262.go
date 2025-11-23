@@ -1,27 +1,19 @@
 package problems
 
-import "math"
-
 func maxSumDivThree(nums []int) int {
+	const maxn int = 1e4
+	n := len(nums)
+	big := maxn*n + 1
 	sum := 0
-	min1, min11 := math.MaxInt, math.MaxInt
-	min2, min22 := math.MaxInt, math.MaxInt
+	min1 := big
+	min2 := big
 	for _, x := range nums {
 		sum += x
 		r := x % 3
-		switch r {
-		case 1:
-			if x < min1 {
-				min1, min11 = x, min1
-			} else if x < min11 {
-				min11 = x
-			}
-		case 2:
-			if x < min2 {
-				min2, min22 = x, min2
-			} else if x < min22 {
-				min22 = x
-			}
+		if r == 1 {
+			min1, min2 = min(min1, x), min(min2, min1+x)
+		} else if r == 2 {
+			min1, min2 = min(min1, min2+x), min(min2, x)
 		}
 	}
 	r := sum % 3
@@ -29,25 +21,7 @@ func maxSumDivThree(nums []int) int {
 		return sum
 	}
 	if r == 1 {
-		x1 := min1
-		x2 := math.MaxInt
-		if min22 != math.MaxInt {
-			x2 = min2 + min22
-		}
-		sub := min(x1, x2)
-		if sub != math.MaxInt {
-			return sum - sub
-		}
-		return 0
+		return sum - min1
 	}
-	x1 := min2
-	x2 := math.MaxInt
-	if min11 != math.MaxInt {
-		x2 = min1 + min11
-	}
-	sub := min(x1, x2)
-	if sub != math.MaxInt {
-		return sum - sub
-	}
-	return 0
+	return sum - min2
 }
