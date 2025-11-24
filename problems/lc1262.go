@@ -10,9 +10,10 @@ func maxSumDivThree(nums []int) int {
 	for _, x := range nums {
 		sum += x
 		r := x % 3
-		if r == 1 {
+		switch r {
+		case 1:
 			min1, min2 = min(min1, x), min(min2, min1+x)
-		} else if r == 2 {
+		case 2:
 			min1, min2 = min(min1, min2+x), min(min2, x)
 		}
 	}
