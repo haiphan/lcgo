@@ -9,10 +9,11 @@ func integerBreak(n int) int {
 	}
 	r := n % 3
 	c3 := n / 3
-	if r == 1 {
+	switch r {
+	case 1:
 		r = 4
 		c3--
-	} else if r == 0 {
+	case 0:
 		r = 1
 	}
 	return intPow(3, c3) * r
