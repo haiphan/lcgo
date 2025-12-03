@@ -6,11 +6,12 @@ func compTwo(x int) int {
 
 func countTrapezoids3625(points [][]int) int {
 	n := len(points)
-	slopes := make(map[[2]int]int, n)
-	lines := make(map[[3]int]int)
-	midPoints := make(map[[2]int]int)
-	midLines := make(map[[5]int]int)
-	for i := 0; i < n; i++ {
+	maxPairs := n * (n - 1) / 2
+	slopes := make(map[[2]int]int, maxPairs)
+	lines := make(map[[3]int]int, maxPairs)
+	midPoints := make(map[[2]int]int, maxPairs)
+	midLines := make(map[[5]int]int, maxPairs)
+	for i := range n {
 		x1, y1 := points[i][0], points[i][1]
 		for j := i + 1; j < n; j++ {
 			x2, y2 := points[j][0], points[j][1]
