@@ -1,6 +1,9 @@
 package problems
 
 func compTwo(x int) int {
+	if x < 2 {
+		return 0
+	}
 	return x * (x - 1) / 2
 }
 
