@@ -33,6 +33,7 @@ func countPartitions3578(nums []int, k int) int {
 			}
 			l++
 		}
+		// dp[r+1] = sum of dp[l..r]
 		dp[r+1] = prefix[r]
 		if l > 0 {
 			dp[r+1] = (dp[r+1] - prefix[l-1] + MOD) % MOD
