@@ -11,7 +11,7 @@ func divideArray(nums []int, k int) [][]int {
 		if nums[i]-nums[i-2] > k {
 			return [][]int{}
 		}
-		res = append(res, []int{nums[i-2], nums[i-1], nums[i]})
+		res = append(res, nums[i-2:i+1])
 	}
 	return res
 }
