@@ -10,17 +10,17 @@ func maxProfit3652(prices []int, strategy []int, k int) int64 {
 	}
 	sum := 0
 	hs := 0
-	win_orig := 0
-	win_mod := 0
+	pBase := 0
+	pMod := 0
 	for i, x := range ss {
 		if i >= h {
 			hs += pp[i]
 		}
 		if i < k {
-			win_orig += x
+			pBase += x
 		}
 		if i >= h && i < k {
-			win_mod += pp[i]
+			pMod += pp[i]
 		}
 		sum += x
 	}
@@ -29,12 +29,12 @@ func maxProfit3652(prices []int, strategy []int, k int) int64 {
 		change := hs - sum
 		return int64(sum + max(0, change))
 	}
-	max_ch := win_mod - win_orig
+	maxDiff := pMod - pBase
 
 	for i := 1; i <= n-k; i++ {
-		win_orig += ss[i+k-1] - ss[i-1]
-		win_mod += pp[i+k-1] - pp[i-1+h]
-		max_ch = max(max_ch, win_mod-win_orig)
+		pBase += ss[i+k-1] - ss[i-1]
+		pMod += pp[i+k-1] - pp[i-1+h]
+		maxDiff = max(maxDiff, pMod-pBase)
 	}
-	return int64(sum + max(0, max_ch))
+	return int64(sum + max(0, maxDiff))
 }
