@@ -7,9 +7,9 @@ func maxValue(events [][]int, k int) int {
 	sort.Slice(events, func(i, j int) bool {
 		return events[i][0] < events[j][0]
 	})
-	d1 := make([]int, n+1)
-	d2 := make([]int, n+1)
-	dp := [2][]int{d1, d2}
+	dp := make([]int, n+1)
+	ndp := make([]int, n+1)
+	// next[i]: the next event index that can be attended after attending event i
 	next := make([]int, n)
 	for j := range n {
 		end := events[j][1]
@@ -18,13 +18,12 @@ func maxValue(events [][]int, k int) int {
 		})
 	}
 	for j := 1; j <= k; j++ {
-		cur := j & 1
-		prev := cur ^ 1
 		for i := n - 1; i >= 0; i-- {
-			attend_i := events[i][2] + dp[prev][next[i]]
-			skip_i := dp[cur][i+1]
-			dp[cur][i] = max(attend_i, skip_i)
+			attend_i := events[i][2] + dp[next[i]]
+			skip_i := ndp[i+1]
+			ndp[i] = max(attend_i, skip_i)
 		}
+		dp, ndp = ndp, dp
 	}
-	return dp[k&1][0]
+	return dp[0]
 }
