@@ -1,68 +1,95 @@
 package problems
 
-import "container/heap"
-
-type Server struct {
-	a, b int
+type SegmentTree struct {
+	n    int
+	tree []int
 }
 
-type ServerHeap []Server
-
-func (sh ServerHeap) Len() int { return len(sh) }
-
-func (sh ServerHeap) Less(i, j int) bool {
-	return sh[i].a < sh[j].a
-}
-
-func (sh ServerHeap) Swap(i, j int) {
-	sh[i], sh[j] = sh[j], sh[i]
-}
-
-func (sh *ServerHeap) Push(x any) {
-	*sh = append(*sh, x.(Server))
-}
-
-func (sh *ServerHeap) Pop() any {
-	old := *sh
-	n := len(old)
-	x := old[n-1]
-	*sh = old[0 : n-1]
-	return x
-}
-
-func busiestServers(k int, arrival []int, load []int) []int {
-	count := make([]int, k)
-	free := make([]Server, k)
-	busy := make([]Server, 0)
-	for i := range k {
-		free[i] = Server{a: i, b: 0}
+func NewSegmentTree(data []int) *SegmentTree {
+	n := len(data)
+	st := &SegmentTree{
+		n:    n,
+		tree: make([]int, 4*n),
 	}
-	freeHeap := (*ServerHeap)(&free)
-	busyHeap := (*ServerHeap)(&busy)
-	heap.Init(freeHeap)
-	heap.Init(busyHeap)
+	st.build(data, 1, 0, n-1)
+	return st
+}
+
+func (st *SegmentTree) build(data []int, node, start, end int) {
+	if start == end {
+		st.tree[node] = data[start]
+		return
+	}
+	mid := (start + end) / 2
+	st.build(data, 2*node, start, mid)
+	st.build(data, 2*node+1, mid+1, end)
+	st.tree[node] = min(st.tree[2*node], st.tree[2*node+1])
+}
+
+func (st *SegmentTree) Update(i, v int) {
+	st.update(1, 0, st.n-1, i, v)
+}
+
+func (st *SegmentTree) update(node, start, end, idx, val int) {
+	if start == end {
+		st.tree[node] = val
+		return
+	}
+	mid := (start + end) / 2
+	if idx <= mid {
+		st.update(2*node, start, mid, idx, val)
+	} else {
+		st.update(2*node+1, mid+1, end, idx, val)
+	}
+	st.tree[node] = min(st.tree[2*node], st.tree[2*node+1])
+}
+
+func (st *SegmentTree) GetLte(l, r, v int) int {
+	return st.getLte(1, 0, st.n-1, l, r, v)
+}
+
+func (st *SegmentTree) getLte(node, start, end, l, r, v int) int {
+	// 1. Range is completely outside OR the minimum in this range is > v
+	if start > end || start > r || end < l || st.tree[node] > v {
+		return -1
+	}
+
+	// 2. Leaf node found that satisfies the condition
+	if start == end {
+		return start
+	}
+
+	mid := (start + end) / 2
+
+	// 3. Search Left Child First (to find the "first" index)
+	res := st.getLte(2*node, start, mid, l, r, v)
+	if res != -1 {
+		return res
+	}
+
+	// 4. If not in left, search Right Child
+	return st.getLte(2*node+1, mid+1, end, l, r, v)
+}
+func busiestServers(k int, arrival []int, load []int) []int {
+	arr := make([]int, k)
+	last := k - 1
+	count := make([]int, k)
+	st := NewSegmentTree(arr)
 	maxc := 0
-	for i, t := range arrival {
-		for busyHeap.Len() > 0 && (*busyHeap)[0].a <= t {
-			top := heap.Pop(busyHeap).(Server)
-			s := top.b
-			if s < i {
-				s = i + ((s-i)%k+k)%k
-			}
-			top.a = s
-			heap.Push(freeHeap, top)
+	for i, start := range arrival {
+		ii := i % k
+		sv := st.GetLte(ii, last, start)
+		if sv == -1 && ii > 0 {
+			sv = st.GetLte(0, ii-1, start)
 		}
-		if freeHeap.Len() == 0 {
+		if sv == -1 {
 			continue
 		}
-		top := heap.Pop(freeHeap).(Server)
-		si := top.a % k
-		count[si]++
-		maxc = max(maxc, count[si])
-		top.a, top.b = t+load[i], top.a
-		heap.Push(busyHeap, top)
+		count[sv]++
+		maxc = max(maxc, count[sv])
+		st.Update(sv, start+load[i])
 	}
-	res := make([]int, 0)
+	res := make([]int, 0, k)
 	for i := range k {
 		if count[i] == maxc {
 			res = append(res, i)
