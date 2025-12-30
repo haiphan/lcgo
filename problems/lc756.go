@@ -3,48 +3,43 @@ package problems
 import "math/bits"
 
 func pyramidTransition(bottom string, allowed []string) bool {
-	var bToH [36]int
+	var bToH [64]int
 	n := len(bottom)
 	for _, a := range allowed {
-		bToH[6*(a[0]-'A')+a[1]-'A'] |= (1 << int(a[2]-'A'))
+		cl, cr, ct := a[0]&31, a[1]&31, a[2]&31
+		bToH[cl<<3+cr] |= (1 << ct)
 	}
-
-	// Encode row as integer: each char takes 5 bits (up to 26 letters)
-	encodeRow := func(row []byte) int {
-		result := 0
-		for _, ch := range row {
-			result = (result << 5) | int(ch-'A')
-		}
-		return result
+	pyramid := make([]int, n)
+	for i, c := range bottom {
+		pyramid[n-1] |= int(c&31) << (i * 3)
 	}
-
-	memo := make(map[int]bool)
-
-	var backtrack func(row, nextRow []byte, i int) bool
-	backtrack = func(row, nextRow []byte, i int) bool {
-		if len(row) == 1 {
+	seen := make([]bool, 1<<((n-1)*3))
+	var backtrack func(row, col int) bool
+	backtrack = func(row, col int) bool {
+		if row < 0 {
 			return true
 		}
-		if i == len(nextRow) {
-			rowCode := encodeRow(nextRow)
-			if val, ok := memo[rowCode]; ok {
-				return val
-			}
-			result := backtrack(nextRow, make([]byte, len(nextRow)-1), 0)
-			memo[rowCode] = result
-			return result
+		rowVal := pyramid[row]
+		if seen[rowVal] {
+			return false
 		}
-
-		chars := uint32(bToH[6*(row[i]-'A')+row[i+1]-'A'])
+		if col == row+1 {
+			seen[rowVal] = true
+			return backtrack(row-1, 0)
+		}
+		prevVal := pyramid[row+1]
+		cl, cr := (prevVal>>(col*3))&7, (prevVal>>((col+1)*3))&7
+		chars := uint32(bToH[cl<<3+cr])
 		for chars != 0 {
-			j := bits.TrailingZeros32(chars)
-			nextRow[i] = byte('A' + j)
-			if backtrack(row, nextRow, i+1) {
+			ct := bits.TrailingZeros32(chars)
+			pyramid[row] &^= 7 << (col * 3)
+			pyramid[row] |= ct << (col * 3)
+			if backtrack(row, col+1) {
 				return true
 			}
 			chars &= (chars - 1)
 		}
 		return false
 	}
-	return backtrack([]byte(bottom), make([]byte, n-1), 0)
+	return backtrack(n-2, 0)
 }
