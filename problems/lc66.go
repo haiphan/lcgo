@@ -12,7 +12,10 @@ func plusOne(digits []int) []int {
 		}
 	}
 	if c > 0 {
-		digits = append([]int{c}, digits...)
+		result := make([]int, N+1)
+		result[0] = c
+		copy(result[1:], digits)
+		digits = result
 	}
 	return digits
 }

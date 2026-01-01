@@ -23,6 +23,7 @@ func pyramidTransition(bottom string, allowed []string) bool {
 		if seen[rowVal] {
 			return false
 		}
+		// row i length is i+1
 		if col == row+1 {
 			seen[rowVal] = true
 			return backtrack(row-1, 0)
