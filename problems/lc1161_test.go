@@ -14,7 +14,7 @@ func TestMaxLevelSum(t *testing.T) {
 	}{
 		{
 			name: "Example 1",
-			root: utils.DeserializeTree("1,7,7,#,#-8,#,#,0,#,#"),
+			root: utils.DeserializeTree("1,7,7,#,#,-8,#,#,0,#,#"),
 			want: 2,
 		},
 	}
