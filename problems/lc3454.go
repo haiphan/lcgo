@@ -5,13 +5,45 @@ import "sort"
 type YEvent struct {
 	y      int
 	x1, x2 int
-	typ    int
+	typ    int // 1 for bottom edge, -1 for top edge
 }
 
+// IntervalData stores the union width and cumulative area at each Y-step
 type IntervalData struct {
 	yStart  int
 	width   int
 	cumArea int64
+}
+
+// SegmentTree maintains the union length of active X-intervals
+type XSegmentTree struct {
+	count      []int
+	widthTotal []int
+	sortedX    []int
+}
+
+func (st *XSegmentTree) Update(node, start, end, l, r, val int) {
+	// Standard Interval Segment Tree Update
+	if l <= start && end <= r {
+		st.count[node] += val
+	} else {
+		mid := (start + end) / 2
+		if l < mid {
+			st.Update(2*node, start, mid, l, r, val)
+		}
+		if r > mid {
+			st.Update(2*node+1, mid, end, l, r, val)
+		}
+	}
+
+	// Recalculate Width: If count > 0, the whole segment is covered
+	if st.count[node] > 0 {
+		st.widthTotal[node] = st.sortedX[end] - st.sortedX[start]
+	} else if end-start > 1 {
+		st.widthTotal[node] = st.widthTotal[2*node] + st.widthTotal[2*node+1]
+	} else {
+		st.widthTotal[node] = 0
+	}
 }
 
 func separateSquares3454(squares [][]int) float64 {
@@ -21,74 +53,58 @@ func separateSquares3454(squares [][]int) float64 {
 		return 0
 	}
 
+	// 1. Collect Events and unique X-coordinates
 	events := make([]YEvent, 0, 2*n)
-	xCoordsMap := make(map[int]bool)
+	xCoords := make([]int, 0, 2*n)
 	for _, s := range sqs {
 		x, y, l := s[0], s[1], s[2]
 		events = append(events, YEvent{y, x, x + l, 1})
 		events = append(events, YEvent{y + l, x, x + l, -1})
-		xCoordsMap[x] = true
-		xCoordsMap[x+l] = true
+		xCoords = append(xCoords, x, x+l)
 	}
 
-	sort.Slice(events, func(i, j int) bool {
-		return events[i].y < events[j].y
-	})
-
-	sortedX := make([]int, 0, len(xCoordsMap))
-	for x := range xCoordsMap {
-		sortedX = append(sortedX, x)
+	// 2. Efficient Coordinate Compression for X
+	sort.Ints(xCoords)
+	uniqueIdx := 0
+	for i := 1; i < len(xCoords); i++ {
+		if xCoords[i] != xCoords[uniqueIdx] {
+			uniqueIdx++
+			xCoords[uniqueIdx] = xCoords[i]
+		}
 	}
-	sort.Ints(sortedX)
+	sortedX := xCoords[:uniqueIdx+1]
+	numX := len(sortedX)
 
-	xMap := make(map[int]int)
+	// Map X-values to their indices for O(1) lookup
+	xMap := make(map[int]int, numX)
 	for i, x := range sortedX {
 		xMap[x] = i
 	}
 
-	numX := len(sortedX)
-	count := make([]int, 4*numX)
-	widthTotal := make([]int, 4*numX)
+	// 3. Sort Events by Y
+	sort.Slice(events, func(i, j int) bool {
+		return events[i].y < events[j].y
+	})
 
-	// Segment Tree Update Function
-	update := func(lIdx, rIdx, val int) {
-		var updateTree func(int, int, int)
-		updateTree = func(node, start, end int) {
-			if lIdx <= start && end <= rIdx {
-				count[node] += val
-			} else {
-				mid := (start + end) / 2
-				if lIdx < mid {
-					updateTree(2*node, start, mid)
-				}
-				if rIdx > mid {
-					updateTree(2*node+1, mid, end)
-				}
-			}
-			if count[node] > 0 {
-				widthTotal[node] = sortedX[end] - sortedX[start]
-			} else if end-start > 1 {
-				widthTotal[node] = widthTotal[2*node] + widthTotal[2*node+1]
-			} else {
-				widthTotal[node] = 0
-			}
-		}
-		updateTree(1, 0, numX-1)
+	// 4. Initialize Segment Tree
+	tree := &XSegmentTree{
+		count:      make([]int, 4*numX),
+		widthTotal: make([]int, 4*numX),
+		sortedX:    sortedX,
 	}
 
-	// First Pass: Sweep and Cache
+	// 5. Sweep and Cache Cumulative Area
 	history := make([]IntervalData, 0, len(events))
 	var currentArea int64
 
 	for i := 0; i < len(events)-1; i++ {
-		update(xMap[events[i].x1], xMap[events[i].x2], events[i].typ)
+		tree.Update(1, 0, numX-1, xMap[events[i].x1], xMap[events[i].x2], events[i].typ)
 
-		w := widthTotal[1]
-		dy := int64(events[i+1].y - events[i].y)
+		w := tree.widthTotal[1]
+		dy := events[i+1].y - events[i].y
 
-		// We only care about intervals with actual height
 		if dy > 0 {
-			currentArea += int64(w) * dy
+			currentArea += int64(w) * int64(dy)
 			history = append(history, IntervalData{
 				yStart:  events[i].y,
 				width:   w,
@@ -101,15 +117,15 @@ func separateSquares3454(squares [][]int) float64 {
 		return 0
 	}
 
+	// 6. Binary Search for the target interval
 	totalArea := history[len(history)-1].cumArea
 	target := float64(totalArea) / 2.0
 
-	// Binary Search the cached history
 	idx := sort.Search(len(history), func(i int) bool {
 		return float64(history[i].cumArea) >= target
 	})
 
-	// Linear Interpolation in the identified interval
+	// 7. Solve for y0 using Linear Interpolation
 	found := history[idx]
 	areaBefore := float64(0)
 	if idx > 0 {
