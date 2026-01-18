@@ -61,7 +61,8 @@ func largestMagicSquare(grid [][]int) int {
 			if i > 0 && j < NC-1 {
 				d2Pre[i][j] += d2Pre[i-1][j+1]
 			}
-			for k := ans; k <= i && k <= j; k++ {
+			maxK := min(i, j)
+			for k := maxK; k >= ans; k-- {
 				sum := colPre[i][j]
 				valid := true
 				if i-k > 0 {
@@ -92,6 +93,7 @@ func largestMagicSquare(grid [][]int) int {
 				}
 				// Add 1 to k to convert from index to size
 				ans = k + 1
+				break
 			}
 		}
 	}
