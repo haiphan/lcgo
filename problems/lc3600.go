@@ -2,15 +2,18 @@ package problems
 
 import (
 	"math"
+	"sort"
 )
 
 func maxStability(n int, edges [][]int, k int) int {
 	orig_uf := NewUnionFind(n)
 	min_str := math.MaxInt32
 	max_str := 0
+	optional := make([][3]int, 0, len(edges))
 	for i := range edges {
 		max_str = max(max_str, edges[i][2])
 		if edges[i][3] == 0 {
+			optional = append(optional, [3]int{edges[i][0], edges[i][1], edges[i][2]})
 			continue
 		}
 		min_str = min(min_str, edges[i][2])
@@ -18,6 +21,10 @@ func maxStability(n int, edges [][]int, k int) int {
 			return -1
 		}
 	}
+	sort.Slice(optional, func(i, j int) bool {
+		return optional[i][2] > optional[j][2]
+	})
+
 	check := func(sta int) bool {
 		if sta > min_str {
 			return false
@@ -27,20 +34,19 @@ func maxStability(n int, edges [][]int, k int) int {
 			uf.rank[i] = orig_uf.rank[i]
 			uf.par[i] = orig_uf.par[i]
 		}
-		upgrade := make([][2]int, 0, n)
-		for i := range edges {
-			if edges[i][3] == 1 {
-				continue
-			}
-			if edges[i][2] >= sta {
-				uf.Union(edges[i][0], edges[i][1])
-			} else if edges[i][2]*2 >= sta {
-				upgrade = append(upgrade, [2]int{edges[i][0], edges[i][1]})
-			}
+
+		// Free optional edges first: w >= sta.
+		idx := 0
+		for idx < len(optional) && optional[idx][2] >= sta {
+			uf.Union(optional[idx][0], optional[idx][1])
+			idx++
 		}
+
 		r := k
-		for i := range upgrade {
-			u, v := upgrade[i][0], upgrade[i][1]
+		// Then upgrade-eligible optional edges: ceil(sta/2) <= w < sta.
+		for idx < len(optional) && optional[idx][2]*2 >= sta {
+			u, v := optional[idx][0], optional[idx][1]
+			idx++
 			if uf.Find(u) == uf.Find(v) {
 				continue
 			}

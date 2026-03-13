@@ -14,6 +14,44 @@ type TreeNode = utils.TreeNode
 var drs [4]int = [4]int{-1, 1, 0, 0}
 var dcs [4]int = [4]int{0, 0, -1, 1}
 
+type UnionFind struct {
+	par  []int
+	rank []int
+}
+
+func NewUnionFind(n int) *UnionFind {
+	uf := &UnionFind{
+		par:  make([]int, n),
+		rank: make([]int, n),
+	}
+	for i := 0; i < n; i++ {
+		uf.par[i] = i
+	}
+	return uf
+}
+
+func (uf *UnionFind) Find(x int) int {
+	if uf.par[x] != x {
+		uf.par[x] = uf.Find(uf.par[x])
+	}
+	return uf.par[x]
+}
+
+func (uf *UnionFind) Union(a, b int) bool {
+	ra, rb := uf.Find(a), uf.Find(b)
+	if ra == rb {
+		return false
+	}
+	if uf.rank[ra] < uf.rank[rb] {
+		ra, rb = rb, ra
+	}
+	uf.par[rb] = ra
+	if uf.rank[ra] == uf.rank[rb] {
+		uf.rank[ra]++
+	}
+	return true
+}
+
 func GCD(a, b int) int {
 	for b != 0 {
 		a, b = b, a%b
