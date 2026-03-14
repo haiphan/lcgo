@@ -7,6 +7,7 @@ import (
 
 func maxStability(n int, edges [][]int, k int) int {
 	orig_uf := NewUnionFind(n)
+	baseComps := n
 	min_str := math.MaxInt32
 	max_str := 0
 	optional := make([][3]int, 0, len(edges))
@@ -20,25 +21,33 @@ func maxStability(n int, edges [][]int, k int) int {
 		if !orig_uf.Union(edges[i][0], edges[i][1]) {
 			return -1
 		}
+		baseComps--
 	}
 	sort.Slice(optional, func(i, j int) bool {
 		return optional[i][2] > optional[j][2]
 	})
+	uf := NewUnionFind(n)
 
 	check := func(sta int) bool {
 		if sta > min_str {
 			return false
 		}
-		uf := NewUnionFind(n)
-		for i := range n {
-			uf.rank[i] = orig_uf.rank[i]
-			uf.par[i] = orig_uf.par[i]
+		copy(uf.par, orig_uf.par)
+		copy(uf.rank, orig_uf.rank)
+		comps := baseComps
+		if comps == 1 {
+			return true
 		}
 
 		// Free optional edges first: w >= sta.
 		idx := 0
 		for idx < len(optional) && optional[idx][2] >= sta {
-			uf.Union(optional[idx][0], optional[idx][1])
+			if uf.Union(optional[idx][0], optional[idx][1]) {
+				comps--
+				if comps == 1 {
+					return true
+				}
+			}
 			idx++
 		}
 
@@ -55,13 +64,12 @@ func maxStability(n int, edges [][]int, k int) int {
 			}
 			uf.Union(u, v)
 			r--
-		}
-		for i := range n {
-			if uf.Find(i) != uf.Find(0) {
-				return false
+			comps--
+			if comps == 1 {
+				return true
 			}
 		}
-		return true
+		return comps == 1
 	}
 	l, r := -1, max_str<<1
 	for l < r {
